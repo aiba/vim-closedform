@@ -10,6 +10,26 @@ import vim
 # vim.current.window.cursor - get the cursor position as (row, col) (row is 1-based, col is 0-based)
 # vim.current.buffer - a list of the lines in the current buffer (0-based, unfortunately)
 
+CHARPAIRS = [
+  ('(', ')'),
+  ('[', ']'),
+  ('{', '}'),
+  ]
+
+def char_pair(char):
+  for p in CHARPAIRS:
+    if p[0]==char:
+      return p[1]
+    if p[1]==char:
+      return p[0]
+  return None
+
+def is_opener(char):
+  return len([x for x in CHARPAIRS if x[0]==char])
+
+def is_closer(char):
+  return len([x for x in CHARPAIRS if x[1]==char])
+
 def append_char(char):
   (l,c) = vim.current.window.cursor
   (l,c) = (l-1,c)
@@ -33,8 +53,24 @@ def reverse_buffer_char_list():
   result.reverse()
   return result
 
-for c in reverse_buffer_char_list():
-  append_char(c)
+def first_open_form_char(charlist):
+  stack = []
+  for c in charlist:
+    if is_closer(c):
+      stack.append(c)
+    if is_opener(c):
+      if (len(stack) > 0) and (c == char_pair(stack[-1])):
+        stack.pop()
+      else:
+        return char_pair(c)
+  return None
+
+append_char(first_open_form_char(reverse_buffer_char_list()))
+
+# TODO:
+#   ignore things inside strings
+#   ignore clojure ; comments
+#   handle \[ as character, not formchar
 
 EOF
 " Here the python code is closed. We can continue writing VimL or python again.
