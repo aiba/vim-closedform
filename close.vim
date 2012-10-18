@@ -47,7 +47,7 @@ def reverse_buffer_char_list():
   for l in range(0,current_line+1):
     stop = len(buf[l])
     if l == current_line:
-      stop = current_col      # TODO: should this be +1 ??
+      stop = current_col+1
     result += list(buf[l][:stop])
 
   result.reverse()
