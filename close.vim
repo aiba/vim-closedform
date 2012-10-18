@@ -25,10 +25,10 @@ def char_pair(char):
   return None
 
 def is_opener(char):
-  return len([x for x in CHARPAIRS if x[0]==char])
+  return (0 < len([x for x in CHARPAIRS if x[0]==char]))
 
 def is_closer(char):
-  return len([x for x in CHARPAIRS if x[1]==char])
+  return (0 < len([x for x in CHARPAIRS if x[1]==char]))
 
 def append_char(char):
   (l,c) = vim.current.window.cursor
