@@ -81,9 +81,6 @@ else:
   print "No open forms."
 
 # TODO:
-#   ignore things inside strings
-#   ignore clojure ; comments
-#   handle \[ as character, not formchar
 #   test at end of really large file.
 #   cleanup code
 #   write AppendAllClosingFormSymbols to repeatedly call AppendClosingFormSymbol
