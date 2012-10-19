@@ -10,6 +10,9 @@ import vim
 # vim.current.window.cursor - get the cursor position as (row, col) (row is 1-based, col is 0-based)
 # vim.current.buffer - a list of the lines in the current buffer (0-based, unfortunately)
 
+def log(s):
+  open("/tmp/log", "a").write(s)
+
 CHARPAIRS = [
   ('(', ')'),
   ('[', ']'),
@@ -37,42 +40,43 @@ def append_char(char):
   vim.current.buffer[l] = lstr[:c+1] + str(char) + lstr[c+1:]
   vim.current.window.cursor = (l+1,c+1)
 
-def reverse_buffer_char_list():
-  result = []
-
+def buffer_until_cursor():
   (current_line, current_col) = vim.current.window.cursor
-  current_line = current_line-1 # make 0-based
-  buf = vim.current.buffer
+  current_line -= 1 # make 0-based
+  return ("\n".join(vim.current.buffer[0:current_line]
+                    + [vim.current.buffer[current_line][0:current_col+1]])
+                 + "\n")
 
-  for l in range(0,current_line+1):
-    stop = len(buf[l])
-    if l == current_line:
-      stop = current_col+1
-    result += list(buf[l][:stop])
-
-  result.reverse()
-  return result
-
-def first_open_form_char(charlist):
-  in_str = False
+def form_stack():
+  s = buffer_until_cursor()
+  i=0
+  in_str=False
   stack = []
-  for c in charlist:
-    if c == '"':
+  while (i != -1) and (i < len(s)):
+    c=s[i]
+    if c=='\\':
+      i += 2
+      continue
+    if c=='"':
       in_str = not in_str
-    else:
-      if not in_str:
-        if is_closer(c):
-          stack.append(c)
-        if is_opener(c):
-          if (len(stack) > 0) and (c == char_pair(stack[-1])):
-            stack.pop()
-          else:
-            return char_pair(c)
-  return None
+      i += 1
+      continue
+    if not in_str:
+      if c==';':
+        i = s.find('\n', i) # skip to end of line
+        continue
+      if is_opener(c):
+        stack.append(c)
+      if is_closer(c):
+        if (len(stack) > 0) and (c == char_pair(stack[-1])):
+          stack.pop()
+    i += 1
+    continue
+  return stack
 
-c=first_open_form_char(reverse_buffer_char_list())
-if c:
-  append_char(c)
+stack=form_stack()
+if len(stack) > 0:
+  append_char(char_pair(stack[-1]))
 else:
   print "No open forms."
 
@@ -80,6 +84,7 @@ else:
 #   ignore things inside strings
 #   ignore clojure ; comments
 #   handle \[ as character, not formchar
+#   test at end of really large file.
 #   cleanup code
 #   write AppendAllClosingFormSymbols to repeatedly call AppendClosingFormSymbol
 #   documentation
