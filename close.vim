@@ -65,7 +65,11 @@ def first_open_form_char(charlist):
         return char_pair(c)
   return None
 
-append_char(first_open_form_char(reverse_buffer_char_list()))
+c=first_open_form_char(reverse_buffer_char_list())
+if c:
+  append_char(c)
+else:
+  print "No open forms."
 
 # TODO:
 #   ignore things inside strings
@@ -79,5 +83,6 @@ endfunction
 command! -nargs=0 AppendClosingFormSymbol call AppendClosingFormSymbol()
 
 " for testing:
-call AppendClosingFormSymbol()
+imap <C-]> <Esc>:AppendClosingFormSymbol<CR>a
+nmap <C-]> <Esc>:AppendClosingFormSymbol<CR>
 
