@@ -76,8 +76,8 @@ else:
 #   ignore clojure ; comments
 #   handle \[ as character, not formchar
 #   cleanup code
-#   choose keyboard shortcuts
 #   write AppendAllClosingFormSymbols to repeatedly call AppendClosingFormSymbol
+#   documentation
 
 EOF
 " Here the python code is closed. We can continue writing VimL or python again.
@@ -86,6 +86,6 @@ endfunction
 command! -nargs=0 AppendClosingFormSymbol call AppendClosingFormSymbol()
 
 " for testing:
-"imap <C-]> <Esc>:AppendClosingFormSymbol<CR>a
-"nmap <C-]> <Esc>:AppendClosingFormSymbol<CR>
+"imap <M-;> <Esc>:AppendClosingFormSymbol<CR>a
+"nmap <M-;> <Esc>:AppendClosingFormSymbol<CR>
 
