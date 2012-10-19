@@ -54,15 +54,20 @@ def reverse_buffer_char_list():
   return result
 
 def first_open_form_char(charlist):
+  in_str = False
   stack = []
   for c in charlist:
-    if is_closer(c):
-      stack.append(c)
-    if is_opener(c):
-      if (len(stack) > 0) and (c == char_pair(stack[-1])):
-        stack.pop()
-      else:
-        return char_pair(c)
+    if c == '"':
+      in_str = not in_str
+    else:
+      if not in_str:
+        if is_closer(c):
+          stack.append(c)
+        if is_opener(c):
+          if (len(stack) > 0) and (c == char_pair(stack[-1])):
+            stack.pop()
+          else:
+            return char_pair(c)
   return None
 
 c=first_open_form_char(reverse_buffer_char_list())
