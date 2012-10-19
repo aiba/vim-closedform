@@ -3,15 +3,9 @@ if !has('python')
     finish
 endif
 
-function! AppendClosingFormSymbol()
+"-------------------------------------------------------------------------------
 python << EOF
 import vim
-
-# vim.current.window.cursor - get the cursor position as (row, col) (row is 1-based, col is 0-based)
-# vim.current.buffer - a list of the lines in the current buffer (0-based, unfortunately)
-
-def log(s):
-  open("/tmp/log", "a").write(s+"\n")
 
 CHARPAIRS = ["()", "[]", "{}"];
 
@@ -63,29 +57,29 @@ def form_stack():
     continue
   return stack
 
+EOF
+
+"-------------------------------------------------------------------------------
+function! AppendClosingFormSymbol()
+python << EOF
 stack=form_stack()
-log(80*"-")
-log("form stack:")
-log(str(stack))
-log("")
 if len(stack) > 0:
   append_char(char_pair(stack[-1]))
 else:
   print "No open forms."
-
-# TODO:
-#   test at end of really large file.
-#   cleanup code
-#   write AppendAllClosingFormSymbols to repeatedly call AppendClosingFormSymbol
-#   documentation
-
 EOF
-" Here the python code is closed. We can continue writing VimL or python again.
 endfunction
 
-command! -nargs=0 AppendClosingFormSymbol call AppendClosingFormSymbol()
+"-------------------------------------------------------------------------------
+function! AppendAllClosingFormSymbols()
+python << EOF
+stack=form_stack()
+while len(stack) > 0:
+  append_char(char_pair(stack.pop()))
+EOF
+endfunction
 
-" for testing:
-"imap <M-;> <Esc>:AppendClosingFormSymbol<CR>a
-"nmap <M-;> <Esc>:AppendClosingFormSymbol<CR>
+"-------------------------------------------------------------------------------
+command! -nargs=0 AppendClosingFormSymbol call AppendClosingFormSymbol()
+command! -nargs=0 AppendAllClosingFormSymbols call AppendAllClosingFormSymbols()
 
